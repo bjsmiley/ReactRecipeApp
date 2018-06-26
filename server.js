@@ -9,8 +9,8 @@ var query = require("./query.js");
 // Create a request handler for the server
 var reqServer = http.createServer(handler);
 
-// Create a node-static server instance to serve the './public/html' folder
-var fileServer = new static.Server('./public/html');
+// Create a node-static server instance to serve the './public' folder
+var fileServer = new static.Server('./public');
 
 
 
