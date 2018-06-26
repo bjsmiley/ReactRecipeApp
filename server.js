@@ -2,12 +2,14 @@ var http = require("http");
 var static = require("node-static");
 var url = require("url");
 //var fs = require("fs");
+//var {Client} = require("pg")
 var query = require("./query.js");
+//var dbInfo = require("./dbInfo.js");
 
 // Create a request handler for the server
 var reqServer = http.createServer(handler);
 
-// Create a node-static server instance to serve the './public' folder
+// Create a node-static server instance to serve the './public/html' folder
 var fileServer = new static.Server('./public/html');
 
 
@@ -20,12 +22,10 @@ function handler( request , response ){
 
         // Get the url of the request
         url = request.url;
-        console.log(url);
 
         if(url.indexOf("/query") == 0){
             // Serve the query
-            console.log(query);
-            query.handler( request, response, url);
+            query.handler( request, response, url.substr(6) );
         }
         else{
             // Serve the static File
