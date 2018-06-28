@@ -11,11 +11,16 @@ db.connect();
 
 
 function handler(request, response, query){
-    db.query('SELECT * FROM recipes', (err, data) => {
-        if (err) {return console.error("Error running query",err)};
-        goodQuery(request, response, data);
-        //db.end();
-    });
+    if(query == "?getRecipes"){
+        db.query('SELECT * FROM recipes', (err, data) => {
+            if (err) {return console.error("Error running query",err)};
+            goodQuery(request, response, data);
+            //db.end();
+        });
+    }
+    else{
+        badQuery(request,response);
+    }
 }
 
 function goodQuery(request, response, data){
