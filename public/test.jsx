@@ -7,8 +7,10 @@ class Recipe extends React.Component{
   render(){
     return(
       <div className="row">
-        <div id={this.props.id}>{this.props.title}</div>
-        <button className="btn btn-secondary">carot</button>
+        <Well>
+          <div id={this.props.id}>{this.props.title}</div>
+          <button className="btn btn-sm btn-secondary">carot</button>
+        </Well>
       </div>
     );
   }
@@ -52,19 +54,56 @@ class RecipeList extends React.Component{
 class AddButton extends React.Component{
   constructor(props){
     super(props);
+
+    this.state = {
+      show: false
+    };
+
+    this.handleShow = this.handleShow.bind(this);
+    this.handleClose = this.handleClose.bind(this);
     this.add = this.add.bind(this);
+
+  }
+
+  handleClose() {
+    this.setState({ show: false });
+  }
+
+  handleShow() {
+    console.log("clicked!!");
+    this.setState({ show: true });
   }
 
   add() {
-    console.log("clicked!");
+    console.log("add!");
   }
+
+  
 
   render(){
     return(
       <div className="row">
-        <button className="btn btn-primary btn-block" onClick={this.add}>
+        {/* <button className="btn btn-primary btn-block" onClick={this.add}>
           Add Recipes
-        </button>
+        </button> */}
+        <Button bsStyle="primary" bsSize="large" onClick={this.handleShow} block>
+          Add Recipes
+        </Button>
+        <Modal show={this.state.show} onHide={this.handleClose}>
+
+          <Modal.Header closeButton>
+            <Modal.Title>Add A Recipe</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <p>...</p>
+          </Modal.Body>
+
+          <Modal.Footer>
+          <Button onClick={this.add}>Add</Button>
+            <Button onClick={this.handleClose}>Close</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
@@ -82,6 +121,11 @@ class RecipeApp extends React.Component{
 }
 
 var container = document.getElementById("react-container");
+var Button = ReactBootstrap.Button;
+var Modal = ReactBootstrap.Modal;
+var Well = ReactBootstrap.Well;
+// var Button = <ReactBootstrap className="Button"></ReactBootstrap>
+
 ReactDOM.render(
   <RecipeApp/>,
   container
