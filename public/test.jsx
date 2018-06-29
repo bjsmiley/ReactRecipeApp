@@ -1,3 +1,35 @@
+// function FieldGroup({ id, label, help, ...props }) {
+//   return (
+//     <FormGroup controlId={id}>
+//       <ControlLabel>{label}</ControlLabel>
+//       <FormControl {...props} />
+//       {help && <HelpBlock>{help}</HelpBlock>}
+//     </FormGroup>
+//   );
+// }
+
+// class AddForm extends React.Component{
+  
+//   render(){
+//     return(
+//       <Form>
+//         <FieldGroup
+//         id="formControlsText"
+//         type="text"
+//         label="Name"
+//         placeholder="Enter name of recipe"
+//         />
+
+//         <FormGroup controlId="formControlsText">
+//           <ControlLabel>text</ControlLabel>
+//           <FormControl {...props} />
+//           {help && <HelpBlock>Name</HelpBlock>}
+//         </FormGroup>
+//       </Form>
+//     );
+//   }
+// }
+
 class Recipe extends React.Component{
   // constructor(props){
   //   super(props);
@@ -6,12 +38,14 @@ class Recipe extends React.Component{
 
   render(){
     return(
-      <div className="row">
-        <Well>
-          <div id={this.props.id}>{this.props.title}</div>
-          <button className="btn btn-sm btn-secondary">carot</button>
-        </Well>
-      </div>
+      <Row>
+        <Col md={8} mdOffset={2}>
+          <Well>
+            <div id={"title-"+this.props.id}>{this.props.title}</div>
+            <button className="btn btn-sm btn-secondary">carot</button>
+          </Well>
+        </Col>
+      </Row>
     );
   }
 }
@@ -82,29 +116,29 @@ class AddButton extends React.Component{
 
   render(){
     return(
-      <div className="row">
-        {/* <button className="btn btn-primary btn-block" onClick={this.add}>
-          Add Recipes
-        </button> */}
-        <Button bsStyle="primary" bsSize="large" onClick={this.handleShow} block>
-          Add Recipes
-        </Button>
-        <Modal show={this.state.show} onHide={this.handleClose}>
+      <Row>
+        <Col md={8} mdOffset={2}>
+          <Button id="add-btn" bsStyle="primary" bsSize="large" onClick={this.handleShow} block>
+            Add Recipes
+          </Button>
+          <Modal show={this.state.show} onHide={this.handleClose}>
 
-          <Modal.Header closeButton>
-            <Modal.Title>Add A Recipe</Modal.Title>
-          </Modal.Header>
+            <Modal.Header closeButton>
+              <Modal.Title>Add A Recipe</Modal.Title>
+            </Modal.Header>
 
-          <Modal.Body>
-            <p>...</p>
-          </Modal.Body>
+            <Modal.Body>
+              {/* <AddForm/> */}
+              <p>...</p>
+            </Modal.Body>
 
-          <Modal.Footer>
-          <Button onClick={this.add}>Add</Button>
-            <Button onClick={this.handleClose}>Close</Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+            <Modal.Footer>
+            <Button onClick={this.add}>Add</Button>
+              <Button onClick={this.handleClose}>Close</Button>
+            </Modal.Footer>
+          </Modal>
+        </Col>
+      </Row>
     );
   }
 }
@@ -124,6 +158,10 @@ var container = document.getElementById("react-container");
 var Button = ReactBootstrap.Button;
 var Modal = ReactBootstrap.Modal;
 var Well = ReactBootstrap.Well;
+var Row = ReactBootstrap.Row;
+var Col = ReactBootstrap.Col;
+var Form = ReactBootstrap.Form;
+var FieldGroup = ReactBootstrap.FieldGroup;
 // var Button = <ReactBootstrap className="Button"></ReactBootstrap>
 
 ReactDOM.render(
