@@ -18,6 +18,15 @@ function handler(request, response, query){
             //db.end();
         });
     }
+    else if( query.indexOf("?add=") == 0){
+        var cmd = "INSERT INTO recipes ( name, ingredients, directions ) VALUES ( '_name', '_ingredients', '_directions')";
+        var info = query.substr(5).split("+");
+        cmd = cmd.replace("_name",info[0]).replace("_ingredients",info[1]).replace("_directions",info[2]);
+        db.query(cmd, (err,data) => {
+            if (err) {return console.error("Error running query",err)};
+            goodQuery(request, response, data);
+        });
+    }
     else{
         badQuery(request,response);
     }

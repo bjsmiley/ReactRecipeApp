@@ -1,41 +1,44 @@
-// function FieldGroup({ id, label, help, ...props }) {
-//   return (
-//     <FormGroup controlId={id}>
-//       <ControlLabel>{label}</ControlLabel>
-//       <FormControl {...props} />
-//       {help && <HelpBlock>{help}</HelpBlock>}
-//     </FormGroup>
-//   );
-// }
+var globalRecipes = [];
 
-// class AddForm extends React.Component{
+function FieldGroup({ id, label, help, ...props }) {
+  return (
+    <FormGroup controlId={id}>
+      <ControlLabel>{label}</ControlLabel>
+      <FormControl {...props} />
+      {help && <HelpBlock>{help}</HelpBlock>}
+    </FormGroup>
+  );
+}
+
+class AddForm extends React.Component{
   
-//   render(){
-//     return(
-//       <Form>
-//         <FieldGroup
-//         id="formControlsText"
-//         type="text"
-//         label="Name"
-//         placeholder="Enter name of recipe"
-//         />
-
-//         <FormGroup controlId="formControlsText">
-//           <ControlLabel>text</ControlLabel>
-//           <FormControl {...props} />
-//           {help && <HelpBlock>Name</HelpBlock>}
-//         </FormGroup>
-//       </Form>
-//     );
-//   }
-// }
+  render(){
+    return(
+      <form id="add-form">
+        <FieldGroup
+        id="formControlsName"
+        type="text"
+        label="Name"
+        placeholder="Enter name of recipe"
+        />
+        <FieldGroup
+        id="formControlsIngredients"
+        type="text"
+        label="Ingredients"
+        placeholder="Enter list of ingredients"
+        />
+        <FieldGroup
+        id="formControlsDirections"
+        type="text"
+        label="Directions"
+        placeholder="Enter directions"
+        />
+      </form>
+    );
+  }
+}
 
 class Recipe extends React.Component{
-  // constructor(props){
-  //   super(props);
-  //   //this.state = {title: props.title, ingredients: props.ingredients, directions: props.directions};
-  // }
-
   render(){
     return(
       <Row>
@@ -51,29 +54,14 @@ class Recipe extends React.Component{
 }
 
 class RecipeList extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {list: []};
-
-    var oReq = new XMLHttpRequest();
-    var url = "query?getRecipes"
-    oReq.open("GET", url);
-    oReq.addEventListener("load", ()=> {callback(this);} );
-    oReq.send();
-
-    function callback(self){
-      var response = JSON.parse(oReq.responseText);
-      self.setState({list: response});
-    }
-  }
   render(){
 
     var _list; 
     var map;
 
-    if( this.state.list.length > 0 ){
-      _list = this.state.list;
-      map = _list.map( function (value,index){return <Recipe key={value.id} id={"recipe-"+index} title={value.name}/> });
+    if( this.props.list.length > 0 ){
+      _list = this.props.list;
+      map = _list.map( function (value){return <Recipe key={value.id} id={"recipe-"+value.id} title={value.name}/> });
     }
     else{
       map = (<div>Loading...</div>);
@@ -95,8 +83,7 @@ class AddButton extends React.Component{
 
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    this.add = this.add.bind(this);
-
+    this.close = this.close.bind(this);
   }
 
   handleClose() {
@@ -104,15 +91,12 @@ class AddButton extends React.Component{
   }
 
   handleShow() {
-    console.log("clicked!!");
     this.setState({ show: true });
   }
-
-  add() {
-    console.log("add!");
+  close(){
+    this.props.add();
+    this.setState({ show: false });
   }
-
-  
 
   render(){
     return(
@@ -128,13 +112,12 @@ class AddButton extends React.Component{
             </Modal.Header>
 
             <Modal.Body>
-              {/* <AddForm/> */}
-              <p>...</p>
+              <AddForm/>
             </Modal.Body>
 
             <Modal.Footer>
-            <Button onClick={this.add}>Add</Button>
-              <Button onClick={this.handleClose}>Close</Button>
+            <Button onClick={this.close}>Add</Button>
+              <Button onClick={this.handleClose}>Cancel</Button>
             </Modal.Footer>
           </Modal>
         </Col>
@@ -144,11 +127,55 @@ class AddButton extends React.Component{
 }
 
 class RecipeApp extends React.Component{
+  constructor(props){
+
+    super(props);
+    this.state = {list: []};
+    this.add = this.add.bind(this);
+
+    var oReq = new XMLHttpRequest();
+    var url = "query?getRecipes"
+    oReq.open("GET", url);
+    oReq.addEventListener("load", ()=> {callback(this);} );
+    oReq.send();
+
+    function callback(self){
+      var response = JSON.parse(oReq.responseText);
+      self.setState({list: response});
+    }
+
+  }
+
+  add(){
+    var name = document.getElementById("formControlsName").value;
+    var ingredients = document.getElementById("formControlsIngredients").value;
+    var directions = document.getElementById("formControlsDirections").value;
+    var oReq = new XMLHttpRequest();
+    var url = "query?add="+name+"+"+ingredients+"+"+directions;
+
+    oReq.open("GET", url);
+    oReq.addEventListener("load", ()=> {callbackAdd(this);} );
+    oReq.send();
+
+    function callbackAdd(self){
+      var oReq2 = new XMLHttpRequest();
+      var url2 = "query?getRecipes";
+      oReq2.open("GET", url2);
+      oReq2.addEventListener("load", ()=> {callback2(self);} );
+      oReq2.send();
+
+      function callback2(self){
+        var response = JSON.parse(oReq2.responseText);
+        self.setState({list: response});
+      }
+    }
+  }
+
   render(){
     return(
       <div className="container">
-        <AddButton/>
-        <RecipeList/>
+        <AddButton add={this.add}/>
+        <RecipeList list={this.state.list}/>
       </div>
     );
   }
@@ -160,9 +187,9 @@ var Modal = ReactBootstrap.Modal;
 var Well = ReactBootstrap.Well;
 var Row = ReactBootstrap.Row;
 var Col = ReactBootstrap.Col;
-var Form = ReactBootstrap.Form;
-var FieldGroup = ReactBootstrap.FieldGroup;
-// var Button = <ReactBootstrap className="Button"></ReactBootstrap>
+var FormGroup = ReactBootstrap.FormGroup;
+var ControlLabel = ReactBootstrap.ControlLabel;
+var FormControl = ReactBootstrap.FormControl;
 
 ReactDOM.render(
   <RecipeApp/>,
