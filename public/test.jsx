@@ -39,13 +39,57 @@ class AddForm extends React.Component{
 }
 
 class Recipe extends React.Component{
+  constructor(props){
+    super(props);
+
+    this.state = {
+      show: false
+    };
+
+    this.handleShow = this.handleShow.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+  
+  handleClose() {
+    this.setState({ show: false });
+  }
+
+  handleShow() {
+    this.setState({ show: true });
+  }
+
+  handleDelete(){
+    this.props.delete(this.props.id);
+    this.setState({ show: false });
+
+  }
   render(){
     return(
       <Row>
         <Col md={8} mdOffset={2}>
           <Well>
-            <div id={"title-"+this.props.id}>{this.props.title}</div>
-            <button className="btn btn-sm btn-secondary">carot</button>
+            <span id={"title-"+this.props.id}>{this.props.title}</span>
+            <Button id={"show-btn-"+this.props.id} bsStyle="primary" bsSize="small" onClick={this.handleShow}>
+            -
+          </Button>
+            <Modal show={this.state.show} onHide={this.handleClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>{this.props.title}</Modal.Title>
+              </Modal.Header>
+
+              <Modal.Body>
+                <h4>Ingredients</h4>
+                <p>{this.props.ingredients}</p>
+                <h4>Directions</h4>
+                <p>{this.props.directions}</p>
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
+                <Button onClick={this.handleClose}>Close</Button>
+            </Modal.Footer>
+            </Modal>
           </Well>
         </Col>
       </Row>
@@ -58,10 +102,13 @@ class RecipeList extends React.Component{
 
     var _list; 
     var map;
+    var _delete = this.props.delete;
 
     if( this.props.list.length > 0 ){
       _list = this.props.list;
-      map = _list.map( function (value){return <Recipe key={value.id} id={"recipe-"+value.id} title={value.name}/> });
+      map = _list.map( function (value){
+              return <Recipe key={value.id} id={value.id} title={value.name} ingredients={value.ingredients} directions={value.directions} delete={_delete}/> 
+            });
     }
     else{
       map = (<div>Loading...</div>);
@@ -132,6 +179,7 @@ class RecipeApp extends React.Component{
     super(props);
     this.state = {list: []};
     this.add = this.add.bind(this);
+    this.delete = this.delete.bind(this);
 
     var oReq = new XMLHttpRequest();
     var url = "query?getRecipes"
@@ -171,11 +219,32 @@ class RecipeApp extends React.Component{
     }
   }
 
+  delete(id){
+    var oReq = new XMLHttpRequest();
+    var url = "query?delete="+id;
+    oReq.open("GET", url);
+    oReq.addEventListener("load", ()=> {callback(this);} );
+    oReq.send();
+
+    function callback(self){
+      var oReq2 = new XMLHttpRequest();
+      var url2 = "query?getRecipes";
+      oReq2.open("GET", url2);
+      oReq2.addEventListener("load", ()=> {callback2(self);} );
+      oReq2.send();
+
+      function callback2(self){
+        var response = JSON.parse(oReq2.responseText);
+        self.setState({list: response});
+      }
+    }
+  }
+
   render(){
     return(
       <div className="container">
         <AddButton add={this.add}/>
-        <RecipeList list={this.state.list}/>
+        <RecipeList list={this.state.list} delete={this.delete}/>
       </div>
     );
   }

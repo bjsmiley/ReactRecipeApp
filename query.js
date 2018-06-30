@@ -21,8 +21,16 @@ function handler(request, response, query){
     else if( query.indexOf("?add=") == 0){
         var cmd = "INSERT INTO recipes ( name, ingredients, directions ) VALUES ( '_name', '_ingredients', '_directions')";
         var info = query.substr(5).split("+");
-        cmd = cmd.replace("_name",info[0]).replace("_ingredients",info[1]).replace("_directions",info[2]);
+        cmd = cmd.replace("_name", decodeURI(info[0]) ).replace("_ingredients", decodeURI(info[1]) ).replace("_directions", decodeURI(info[2]) );
         db.query(cmd, (err,data) => {
+            if (err) {return console.error("Error running query",err)};
+            goodQuery(request, response, data);
+        });
+    }
+    else if(query.indexOf("?delete=") == 0 ){
+        var id = query.substr(8);
+        var cmd = "DELETE FROM recipes WHERE id= " + id;
+        db.query(cmd, (err,data)=>{
             if (err) {return console.error("Error running query",err)};
             goodQuery(request, response, data);
         });
